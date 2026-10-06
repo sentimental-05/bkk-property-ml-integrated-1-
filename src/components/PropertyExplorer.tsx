@@ -39,7 +39,7 @@ const FEATURED_CONDO_ITEMS = [
     distBtsKm: 0.4,
     lat: 13.7548,
     lng: 100.5638,
-    image: "/src/assets/images/condo_modern_interior_1790155522928.jpg",
+    image: "/images/condo_modern_interior_1790155522928.jpg",
     highlight: "ใกล้ MRT พระราม 9 เพียง 400 ม.",
   },
   {
@@ -55,7 +55,7 @@ const FEATURED_CONDO_ITEMS = [
     distBtsKm: 0.9,
     lat: 13.7065,
     lng: 100.5982,
-    image: "/src/assets/images/condo_modern_interior_1790155522928.jpg",
+    image: "/images/condo_modern_interior_1790155522928.jpg",
     highlight: "ราคาเริ่มต้นดี เข้าเมืองสะดวก",
   },
   {
@@ -71,7 +71,7 @@ const FEATURED_CONDO_ITEMS = [
     distBtsKm: 0.35,
     lat: 13.7258,
     lng: 100.5284,
-    image: "/src/assets/images/hero_bkk_skyline_1790155511168.jpg",
+    image: "/images/hero_bkk_skyline_1790155511168.jpg",
     highlight: "Ultra Luxury ใจกลาง CBD สีลม",
   },
   {
@@ -87,7 +87,7 @@ const FEATURED_CONDO_ITEMS = [
     distBtsKm: 0.25,
     lat: 13.7570,
     lng: 100.5662,
-    image: "/src/assets/images/condo_modern_interior_1790155522928.jpg",
+    image: "/images/condo_modern_interior_1790155522928.jpg",
     highlight: "ห่าง MRT เพียง 250 ม.",
   },
 ];
@@ -106,7 +106,7 @@ const FEATURED_HOUSE_ITEMS = [
     distBtsKm: 4.5,
     lat: 13.7431,
     lng: 100.6720,
-    image: "/src/assets/images/house_contemporary_thai_1790155534877.jpg",
+    image: "/images/house_contemporary_thai_1790155534877.jpg",
     highlight: "บ้านเดี่ยว 4 ห้องนอน ทำเลศักยภาพ",
   },
   {
@@ -122,7 +122,7 @@ const FEATURED_HOUSE_ITEMS = [
     distBtsKm: 3.0,
     lat: 13.7225,
     lng: 100.6550,
-    image: "/src/assets/images/house_contemporary_thai_1790155534877.jpg",
+    image: "/images/house_contemporary_thai_1790155534877.jpg",
     highlight: "บ้านหรูแปลงมุม ใกล้ทางด่วน",
   },
   {
@@ -138,7 +138,7 @@ const FEATURED_HOUSE_ITEMS = [
     distBtsKm: 5.0,
     lat: 13.7510,
     lng: 100.6905,
-    image: "/src/assets/images/house_contemporary_thai_1790155534877.jpg",
+    image: "/images/house_contemporary_thai_1790155534877.jpg",
     highlight: "คฤหาสน์ส่วนตัว สวนร่มรื่น",
   },
   {
@@ -154,7 +154,7 @@ const FEATURED_HOUSE_ITEMS = [
     distBtsKm: 1.8,
     lat: 13.7915,
     lng: 100.4950,
-    image: "/src/assets/images/house_contemporary_thai_1790155534877.jpg",
+    image: "/images/house_contemporary_thai_1790155534877.jpg",
     highlight: "ใกล้รถไฟฟ้าสายสีน้ำเงิน",
   },
 ];
@@ -352,7 +352,7 @@ export const PropertyExplorer: React.FC<PropertyExplorerProps> = ({
       {/* 1. Hero Skyline Banner - Mobile-Optimized */}
       <section className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 shadow-md sm:shadow-xl min-h-[220px] sm:min-h-[320px] flex items-center">
         <img
-          src="/src/assets/images/hero_bkk_skyline_1790155511168.jpg"
+          src="/images/hero_bkk_skyline_1790155511168.jpg"
           alt="Bangkok Skyline Condominium"
           className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-luminosity"
           referrerPolicy="no-referrer"
