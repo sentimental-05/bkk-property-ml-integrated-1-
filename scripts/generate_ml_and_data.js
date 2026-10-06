@@ -1,0 +1,78 @@
+import fs from 'fs';
+import path from 'path';
+
+// District profiles for Bangkok Condos (42 districts) with real center lat/lng and realistic price distributions
+const DISTRICT_PROFILES = {
+  'Pathum Wan': { lat: 13.7420, lng: 100.5400, basePrice: 245000, priceStd: 75000, tier: 'Luxury Prime' },
+  'Bang Rak': { lat: 13.7250, lng: 100.5280, basePrice: 175000, priceStd: 65000, tier: 'CBD Prime' },
+  'Sathon': { lat: 13.7180, lng: 100.5330, basePrice: 155000, priceStd: 55000, tier: 'CBD Prime' },
+  'Watthana': { lat: 13.7350, lng: 100.5750, basePrice: 170000, priceStd: 60000, tier: 'Sukhumvit Prime' },
+  'Khlong Toei': { lat: 13.7180, lng: 100.5800, basePrice: 140000, priceStd: 45000, tier: 'Inner City' },
+  'Ratchathewi': { lat: 13.7550, lng: 100.5350, basePrice: 150000, priceStd: 40000, tier: 'Inner City' },
+  'Phaya Thai': { lat: 13.7820, lng: 100.5440, basePrice: 125000, priceStd: 35000, tier: 'Inner City / Ari' },
+  'Huai Khwang': { lat: 13.7750, lng: 100.5750, basePrice: 105000, priceStd: 32000, tier: 'New CBD' },
+  'Chatuchak': { lat: 13.8150, lng: 100.5650, basePrice: 95000, priceStd: 28000, tier: 'Transit Hub' },
+  'Din Daeng': { lat: 13.7700, lng: 100.5650, basePrice: 88000, priceStd: 25000, tier: 'Urban' },
+  'Bang Sue': { lat: 13.8150, lng: 100.5280, basePrice: 92000, priceStd: 24000, tier: 'Grand Station Hub' },
+  'Phra Khanong': { lat: 13.6950, lng: 100.6080, basePrice: 90000, priceStd: 26000, tier: 'Sukhumvit Extension' },
+  'Bang Na': { lat: 13.6700, lng: 100.6150, basePrice: 78000, priceStd: 24000, tier: 'East Gateway' },
+  'Suan Luang': { lat: 13.7250, lng: 100.6250, basePrice: 68000, priceStd: 20000, tier: 'Urban Residential' },
+  'Wang Thonglang': { lat: 13.7750, lng: 100.6050, basePrice: 62000, priceStd: 18000, tier: 'Urban Residential' },
+  'Bang Kapi': { lat: 13.7650, lng: 100.6350, basePrice: 55000, priceStd: 17000, tier: 'Eastern Suburb' },
+  'Khlong San': { lat: 13.7200, lng: 100.5000, basePrice: 118000, priceStd: 42000, tier: 'Riverside / Thonburi' },
+  'Thon Buri': { lat: 13.7150, lng: 100.4850, basePrice: 88000, priceStd: 22000, tier: 'Thonburi Core' },
+  'Bangkok Noi': { lat: 13.7650, lng: 100.4750, basePrice: 75000, priceStd: 22000, tier: 'Historic Thonburi' },
+  'Bang Phlat': { lat: 13.7850, lng: 100.4900, basePrice: 72000, priceStd: 20000, tier: 'River Northern' },
+  'Bangkok Yai': { lat: 13.7300, lng: 100.4750, basePrice: 68000, priceStd: 18000, tier: 'Inner Thonburi' },
+  'Phasi Charoen': { lat: 13.7150, lng: 100.4500, basePrice: 68000, priceStd: 18000, tier: 'West Transit' },
+  'Chom Thong': { lat: 13.6850, lng: 100.4700, basePrice: 62000, priceStd: 16000, tier: 'South West' },
+  'Rat Burana': { lat: 13.6820, lng: 100.4980, basePrice: 65000, priceStd: 19000, tier: 'River South' },
+  'Yan Nawa': { lat: 13.6950, lng: 100.5400, basePrice: 95000, priceStd: 30000, tier: 'Rama 3 Riverside' },
+  'Bang Kho Laem': { lat: 13.6980, lng: 100.5050, basePrice: 102000, priceStd: 45000, tier: 'Charoenkrung River' },
+  'Dusit': { lat: 13.7800, lng: 100.5100, basePrice: 95000, priceStd: 22000, tier: 'Government Historic' },
+  'Pom Prap Sattru Phai': { lat: 13.7540, lng: 100.5160, basePrice: 110000, priceStd: 35000, tier: 'Old Town Core' },
+  'Samphanthawong': { lat: 13.7360, lng: 100.5120, basePrice: 115000, priceStd: 30000, tier: 'Chinatown / Yaowarat' },
+  'Lak Si': { lat: 13.8800, lng: 100.5650, basePrice: 58000, priceStd: 16000, tier: 'North Corridor' },
+  'Don Mueang': { lat: 13.9100, lng: 100.5850, basePrice: 48000, priceStd: 14000, tier: 'Airport Vicinity' },
+  'Bang Khen': { lat: 13.8750, lng: 100.6050, basePrice: 49000, priceStd: 15000, tier: 'North Suburb' },
+  'Sai Mai': { lat: 13.9150, lng: 100.6500, basePrice: 42000, priceStd: 12000, tier: 'Outer North' },
+  'Bueng Kum': { lat: 13.7950, lng: 100.6600, basePrice: 48000, priceStd: 15000, tier: 'North East Suburb' },
+  'Khan Na Yao': { lat: 13.8300, lng: 100.6700, basePrice: 54000, priceStd: 16000, tier: 'Ramintra Corridor' },
+  'Lat Krabang': { lat: 13.7250, lng: 100.7300, basePrice: 52000, priceStd: 14000, tier: 'Suvarnabhumi Airport' },
+  'Prawet': { lat: 13.6950, lng: 100.6450, basePrice: 56000, priceStd: 18000, tier: 'Srinakarin Outer' },
+  'Bang Khun Thian': { lat: 13.6600, lng: 100.4400, basePrice: 46000, priceStd: 15000, tier: 'Rama 2 Outer' },
+  'Bang Khae': { lat: 13.7100, lng: 100.4050, basePrice: 56000, priceStd: 19000, tier: 'Phetkasem West' },
+  'Taling Chan': { lat: 13.7850, lng: 100.4600, basePrice: 66000, priceStd: 18000, tier: 'West Suburban' },
+  'Min Buri': { lat: 13.7950, lng: 100.7100, basePrice: 38000, priceStd: 12000, tier: 'Outer East' }
+};
+
+// House Neighborhood profiles (Ames, Iowa with mock coords anchored in Ames coordinates as described)
+const NEIGHBORHOOD_PROFILES = {
+  'CollgCr': { lat: 42.0210, lng: -93.5930, baseTHB: 6500000, stdTHB: 1200000, thaiDesc: 'ย่านคอลเลจครีก (CollgCr) - ครอบครัวและคนทำงาน' },
+  'Veenker': { lat: 42.0420, lng: -93.6640, baseTHB: 7800000, stdTHB: 1800000, thaiDesc: 'ย่านวีนเคอร์ (Veenker) - บ้านหรูใกล้สนามกอล์ฟ' },
+  'Crawfor': { lat: 42.0410, lng: -93.6030, baseTHB: 6800000, stdTHB: 1500000, thaiDesc: 'ย่านครอว์ฟอร์ด (Crawfor) - ย่านเก่าแก่ร่มรื่น' },
+  'NoRidge': { lat: 42.0480, lng: -93.5900, baseTHB: 10800000, stdTHB: 2800000, thaiDesc: 'ย่านนอร์ธริดจ์ (NoRidge) - ย่านคฤหาสน์หรูหรา' },
+  'Mitchel': { lat: 42.0630, lng: -93.5970, baseTHB: 5100000, stdTHB: 1100000, thaiDesc: 'ย่านมิตเชลล์ (Mitchel) - โซนใต้เมือง' },
+  'Somerst': { lat: 42.0450, lng: -93.6490, baseTHB: 7300000, stdTHB: 1400000, thaiDesc: 'ย่านโซเมอร์เซ็ต (Somerst) - โมเดิร์นผังเมืองสวย' },
+  'NWAmes': { lat: 42.0060, lng: -93.6150, baseTHB: 6200000, stdTHB: 1200000, thaiDesc: 'ย่านนอร์ธเวสต์เอมส์ (NWAmes) - ชานเมืองเงียบสงบ' },
+  'OldTown': { lat: 42.0280, lng: -93.6590, baseTHB: 4100000, stdTHB: 1300000, thaiDesc: 'ย่านเมืองเก่า (OldTown) - คลาสสิกใกล้ใจกลาง' },
+  'BrkSide': { lat: 42.0500, lng: -93.6060, baseTHB: 4000000, stdTHB: 1100000, thaiDesc: 'ย่านบรูกไซด์ (BrkSide) - ชุมชนดั้งเดิม' },
+  'Sawyer': { lat: 42.0120, lng: -93.6160, baseTHB: 4400000, stdTHB: 950000, thaiDesc: 'ย่านซอว์เยอร์ (Sawyer) - ย่านยอดนิยมราคาสบาย' },
+  'NridgHt': { lat: 42.0180, lng: -93.6430, baseTHB: 10400000, stdTHB: 2600000, thaiDesc: 'ย่านนอร์ธริดจ์ไฮท์ (NridgHt) - โซนพรีเมียมสร้างใหม่' },
+  'NAmes': { lat: 42.0500, lng: -93.6590, baseTHB: 4700000, stdTHB: 1050000, thaiDesc: 'ย่านนอร์ธเอมส์ (NAmes) - ชุมชนขนาดใหญ่' },
+  'SawyerW': { lat: 42.0260, lng: -93.6020, baseTHB: 6100000, stdTHB: 1300000, thaiDesc: 'ย่านซอว์เยอร์เวสต์ (SawyerW) - บ้านเดี่ยวสมัยใหม่' },
+  'IDOTRR': { lat: 42.0530, lng: -93.6190, baseTHB: 3300000, stdTHB: 1000000, thaiDesc: 'ย่านไอเดียโอทีอาร์ (IDOTRR) - ใกล้ทางรถไฟ' },
+  'MeadowV': { lat: 42.0490, lng: -93.6440, baseTHB: 3200000, stdTHB: 700000, thaiDesc: 'ย่านเมโดว์วิลเลจ (MeadowV) - ทาวน์เฮาส์กะทัดรัด' },
+  'Edwards': { lat: 42.0270, lng: -93.6560, baseTHB: 4100000, stdTHB: 1150000, thaiDesc: 'ย่านเอ็ดเวิร์ดส์ (Edwards) - ย่านชุมชนกว้างขวาง' },
+  'Timber': { lat: 42.0220, lng: -93.6510, baseTHB: 7900000, stdTHB: 1900000, thaiDesc: 'ย่านทิมเบอร์แลนด์ (Timber) - บ้านเดี่ยวร่มรื่นมีเอกลักษณ์' },
+  'Gilbert': { lat: 42.0340, lng: -93.6700, baseTHB: 6300000, stdTHB: 1200000, thaiDesc: 'ย่านกิลเบิร์ต (Gilbert) - ปลอดภัยและเหมาะกับครอบครัว' },
+  'StoneBr': { lat: 42.0530, lng: -93.6040, baseTHB: 10100000, stdTHB: 2700000, thaiDesc: 'ย่านสโตนบรู๊ค (StoneBr) - บ้านหรูวิวเนินเขา' },
+  'ClearCr': { lat: 42.0040, lng: -93.6350, baseTHB: 6900000, stdTHB: 1600000, thaiDesc: 'ย่านเคลียร์ครีก (ClearCr) - ธรรมชาติและลำธาร' },
+  'NPkVill': { lat: 42.0270, lng: -93.6720, baseTHB: 4600000, stdTHB: 750000, thaiDesc: 'ย่านนอร์ธพาร์ควิลเลจ (NPkVill) - ชุมชนสงบ' },
+  'Blmngtn': { lat: 42.0490, lng: -93.6370, baseTHB: 6300000, stdTHB: 1100000, thaiDesc: 'ย่านบลูมมิงตันไฮท์ (Blmngtn) - บ้านทาวน์โฮมไฮเอนด์' },
+  'BrDale': { lat: 42.0020, lng: -93.5900, baseTHB: 3400000, stdTHB: 650000, thaiDesc: 'ย่านบรู๊คเดล (BrDale) - ทาวน์โฮมขนาดกะทัดรัด' },
+  'SWISU': { lat: 42.0070, lng: -93.6330, baseTHB: 4700000, stdTHB: 1200000, thaiDesc: 'ย่านเซาท์เวสต์มหาวิทยาลัย (SWISU) - ใกล้มหาวิทยาลัย' },
+  'Blueste': { lat: 42.0520, lng: -93.6160, baseTHB: 4500000, stdTHB: 800000, thaiDesc: 'ย่านบลูสเตม (Blueste) - ชุมชนขนาดเล็กน่ารัก' }
+};
+
+console.log('Building real-estate ML data generator...');

@@ -1,0 +1,9 @@
+{
+  "_comment": "แมปชื่อ field จากเว็บ -> ชื่อคอลัมน์ที่โมเดลต้องการ ระบบจับคู่ชื่ออัตโนมัติให้ก่อน (ไม่สนตัวพิมพ์/underscore เช่น bldAge = bld_age) ใส่ที่นี่เฉพาะกรณีชื่อไม่เหมือนกัน หรือ 1 ค่าจากเว็บต้องใส่หลายคอลัมน์",
+  "condo": {
+    "distTran1":   ["dist_tran_mean", "dist_tran_min"],
+    "distShop1":   ["dist_shop_mean", "dist_shop_min"],
+    "distSchool1": ["dist_school_mean", "dist_school_min"]
+  },
+  "house": {}
+}
